@@ -128,9 +128,9 @@ def has_element_in_group(group):
     return flag
 
 
-def set_groups():
-    while len(new_edges[0]) != 0:
-        cur_edge = new_edges[0][0]
+def set_groups(delete_edges):
+    while len(delete_edges) != 0:
+        cur_edge = delete_edges[0]
         cur_edge_point = cur_edge.get_points
         color = get_random_color()
         group = set()
@@ -143,22 +143,22 @@ def set_groups():
 
         group.add(cur_point_1)
         group.add(cur_point_2)
-        del new_edges[0][0]
+        del delete_edges[0]
 
         while has_element_in_group(group):
-            for idx,item in enumerate(new_edges[0]):
+            for idx,item in enumerate(delete_edges):
                 if item.get_points[0] in group:
                     point_group = item.get_points[1]
                     point_group.set_color(color)
 
                     group.add(point_group)
-                    del new_edges[0][idx]
+                    del delete_edges[idx]
                 elif item.get_points[1] in group:
                     point_group = item.get_points[0]
                     point_group.set_color(color)
 
                     group.add(point_group)
-                    del new_edges[0][idx]
+                    del delete_edges[idx]
         print(group)
         groups.append(list(group))
 
@@ -179,15 +179,24 @@ def clusterize(clusters):
         while has_isolation_point():
             dist_points()
 
+        for edge in edges:
+            edge.draw_edge(screen)
+
+
         sorted_edges = sorted(edges, key=lambda x: x.edge_dist, reverse=True)
         del sorted_edges[0:clusters]
 
         new_edges.append(sorted_edges)
 
         for edge in new_edges[0]:
-            print(edge)
+            edge.draw_edge(screen)
 
-        set_groups()
+        pygame.display.update()
+        pygame.display.flip()
+        pygame.event.pump()
+        pygame.time.wait(1000)
+
+        set_groups(new_edges[0])
         print(groups)
 
 
@@ -203,7 +212,7 @@ if __name__ == '__main__':
 
     edges = []
     new_edges = []
-    k = 3
+    k = 5
 
     groups = []
     points_count = 0
@@ -214,10 +223,6 @@ if __name__ == '__main__':
         if len(points) == points_count:
             for point in points:
                 point.draw(screen)
-
-            if len(new_edges) > 0:
-                for edge in new_edges[0]:
-                    edge.draw_edge(screen)
 
             if len(groups) > 0:
                 for group in groups:
