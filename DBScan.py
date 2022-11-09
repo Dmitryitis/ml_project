@@ -58,21 +58,21 @@ class Point:
 
 
 def clusterize():
-    for point1 in points:
-        for point2 in points:
+    for point1 in points_copy:
+        for point2 in points_copy:
             if point1 != point2 and point2 not in point1.distances:
                 point1.add_distance(point2)
 
             if point1 != point2 and point1 not in point2.distances:
                 point2.add_distance(point1)
 
-    while len(points) != 0:
-        for point in points:
+    while len(points_copy) != 0:
+        for point in points_copy:
             if len(point.get_neighbours(eps)) < minPts:
                 singles.append(point)
-                points.remove(point)
+                points_copy.remove(point)
             else:
-                points.remove(point)
+                points_copy.remove(point)
                 point.set_color(Color.GREEN.value)
                 group = [point]
                 for n in point.get_neighbours(eps):
@@ -81,13 +81,13 @@ def clusterize():
                             singles.remove(n)
                         n.set_color(Color.YELLOW.value)
                         group.append(n)
-                        if n in points:
-                            points.remove(n)
+                        if n in points_copy:
+                            points_copy.remove(n)
                     if len(n.get_neighbours(eps)) >= minPts:
                         n.set_color(Color.GREEN.value)
                         group.append(n)
-                        if n in points:
-                            points.remove(n)
+                        if n in points_copy:
+                            points_copy.remove(n)
 
                 groups.append(group)
 
@@ -143,6 +143,7 @@ if __name__ == '__main__':
 
     exit = False
     points = []
+    points_copy = []
     groups = []
     singles = []
     centroids = []
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     while not exit:
         screen.fill((255, 255, 255))
 
-        if len(points) == points_count:
+        if len(points_copy) == points_count:
             for point in points:
                 point.draw(screen)
         else:
@@ -183,11 +184,14 @@ if __name__ == '__main__':
                 coors = event.pos
                 point = Point(coors[0], coors[1])
                 points.append(point)
+                points_copy.append(point)
                 point.draw(screen)
                 points_count += 1
                 print(points_count)
 
             if event.type == pygame.KEYDOWN:
+                points_copy += points
+                points_copy = list(set(points_copy))
                 if event.key == pygame.K_RETURN and len(points) == points_count:
                     clusterize()
                     pygame.display.update()
