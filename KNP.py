@@ -92,7 +92,7 @@ def has_isolation_point():
 
 
 def get_random_color():
-    return tuple(random.randint(2, 253) for _ in range(3))
+    return tuple(random.randint(16, 253) for _ in range(3))
 
 
 def get_isolation_point():
